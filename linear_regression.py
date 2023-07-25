@@ -31,16 +31,26 @@ class LinearRegression:
             
     def predict(self,X):
         return np.dot(X,self.weights) + self.bias
+    
+
+""" Testing the algorithm
 
 X,y = make_regression(n_samples=100,
                         n_features=2,
                         noise=1,random_state=42)
 X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.2,random_state=42)
 
+# Calling the class
 lr = LinearRegression()
+
+# Training the model
 lr.fit(X_train,y_train)
+
+# Making predictions
 y_pred = lr.predict(X_test)
 
 mse = mean_squared_error(y_pred=y_pred,y_true=y_test)
 mae = mean_absolute_error(y_pred=y_pred,y_true=y_test)
-print(mse,mae)
+print(f'Mean Squared Error: {mse: .2f},Mean Absolute Error: {mae: .2f}')
+
+"""
