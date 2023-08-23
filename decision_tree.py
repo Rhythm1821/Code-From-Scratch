@@ -41,8 +41,43 @@ class DecisionTree:
         feat_idxs = np.random.choice(num_features,self.n_feats)
 
         # greedy search
-        pass
-    
+        best_feat,best_thresh = self._best_criteria(X,y,feat_idxs)
+
+    def _best_criteria(self,X,y,feat_idxs):
+        best_gain = -1
+        split_idx,split_threh = None,None
+        for feat_idx in feat_idxs:
+            X_column = X[:,feat_idx]
+            thresholds = np.unique(X_column)
+            for threshold in thresholds:
+                gain = _information_gain(y,X_column,threshold)
+
+                if gain>best_gain:
+                    best_gain=gain
+                    split_idx=feat_idx
+                    split_threh=threshold
+        return split_idx,split_threh
+
+    def _information_gain(self,y,X_column,split_threh):
+        # parent E
+        parent_entropy = entropy(y)
+        # generate split
+        left_idxs,right_idxs = self._split(X_column,split_threh)
+        if len(left_idxs==0) or len(right_idxs==0):
+            return 0
+        # weighted avg child E
+        n=len(y)
+        n_l,n_r = len(left_idxs), len(right_idxs)
+        e_l,e_r =entropy(y[left_idxs]), entropy(y[right_idxs]) 
+        child_entropy = (n_l/n) * e_l + (n_r/n) * e_r
+        # return ig   
+        ig = parent_entropy - child_entropy
+        return ig
+
+    def _split(self,X_column,split_threh):
+        left_idxs = np.argwhere(X_column<=split_threh).flatten()
+        right_idxs = np.argwhere(X_column>split_threh).flatten()
+        return left_idxs,right_idxs
     def predict(self,X):
         # traverse tree
         pass
