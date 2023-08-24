@@ -1,4 +1,6 @@
 import numpy as np
+from collections import Counter
+
 
 def entropy(y):
     hist = np.bincount(y)
@@ -42,6 +44,10 @@ class DecisionTree:
 
         # greedy search
         best_feat,best_thresh = self._best_criteria(X,y,feat_idxs)
+        left_idxs,right_idxs = self._split(X[:,best_feat],best_thresh)
+        left = self._grow_tree(X[left_idxs,:],y[left_idxs],depth+1)
+        right = self._grow_tree(X[right_idxs,:],y[right_idxs],depth+1)
+        return Node(best_feat,best_thresh,left,right)
 
     def _best_criteria(self,X,y,feat_idxs):
         best_gain = -1
@@ -50,7 +56,7 @@ class DecisionTree:
             X_column = X[:,feat_idx]
             thresholds = np.unique(X_column)
             for threshold in thresholds:
-                gain = _information_gain(y,X_column,threshold)
+                gain = self._information_gain(y,X_column,threshold)
 
                 if gain>best_gain:
                     best_gain=gain
@@ -80,7 +86,15 @@ class DecisionTree:
         return left_idxs,right_idxs
     def predict(self,X):
         # traverse tree
-        pass
+        return np.array(self._traverse_tree(x) for x in X)
+
+    def _traverse_tree(self,x,node):
+        if node.is_leaf_node():
+            return node.value
+        
+        if x[node.feat_idx] <= node.threshold:
+            return self._traverse_tree(x,node.left)
+        return self._traverse_tree(x,node.right)
 
     def _most_common_labels(self,y):
         counter = Counter(y)
